@@ -7,9 +7,13 @@ public class Map : MonoBehaviour
     class GameState {
         public int size;
         public bool idle;
-        
+        public Character player;
+        public Character mummy;
+
+        // Static
         public int[,] verticalWall;
         public int[,] horizontalWall;
+        public Vector3 stairPosition;
         public Vector3 stairDirection = Vector3.left;
         public bool restrictedVision = false;
 
@@ -36,9 +40,6 @@ public class Map : MonoBehaviour
     // Internal
     Effect dustFx;
     Effect defeatFx;
-    Character bot;
-    Character player;
-    GameObject stair;
     GameState state;
 
     // Start is called before the first frame update
@@ -50,17 +51,16 @@ public class Map : MonoBehaviour
         foreach (Transform t in transform) {
             int x = (int) t.localPosition.x;
             int y = (int) t.localPosition.y;
-            Vector2 p = new Vector2(x, y);
 
             switch (t.tag) {
                 case "Player":
-                    player = t.GetComponent<Character>();
+                    state.player = t.GetComponent<Character>();
                     break;
                 case "Bot":
-                    bot = t.GetComponent<Character>();
+                    state.mummy = t.GetComponent<Character>();
                     break;
                 case "Stair":
-                    stair = t.gameObject;
+                    state.stairPosition = t.localPosition;
                     if (x == 0) state.stairDirection = Vector3.left;
                     if (y == 0) state.stairDirection = Vector3.down;
                     if (x == n) state.stairDirection = Vector3.right;
@@ -100,6 +100,9 @@ public class Map : MonoBehaviour
 
     IEnumerator Action(Vector3 direction) {
 
+        Character player = state.player;
+        Character mummy = state.mummy;
+
         // Player move 1 step
         if (Blocked(player.transform.localPosition, direction)) yield break;
 
@@ -108,23 +111,24 @@ public class Map : MonoBehaviour
         
         // Mummy move 2 step
         for (int i = 0; i < 2; i++) {
-            Vector3 next_move = Trace(bot.transform.localPosition);
-            bool isBlocked = Blocked(bot.transform.localPosition, next_move);
-            yield return bot.Move(next_move, isBlocked);
+            Vector3 next_move = Trace(mummy.transform.localPosition);
+            bool isBlocked = Blocked(mummy.transform.localPosition, next_move);
+            yield return mummy.Move(next_move, isBlocked);
         }
 
         // Lose
-        if (player.transform.localPosition == bot.transform.localPosition) {
-            Destroy(bot.gameObject);
-            Destroy(player.gameObject);
+        if (player.transform.localPosition == mummy.transform.localPosition) {
 
-            dustFx.gameObject.transform.position = bot.gameObject.transform.position + Vector3.forward;
-            defeatFx.gameObject.transform.position = bot.gameObject.transform.position;
+            dustFx.transform.position = mummy.transform.position;
+            defeatFx.transform.position = mummy.transform.position;
+            
+            Destroy(mummy.gameObject);
+            Destroy(player.gameObject);
 
             StartCoroutine(defeatFx.Run(false));
             yield return StartCoroutine(dustFx.Run(true));
         }
-        else if (player.transform.localPosition == stair.transform.localPosition) {
+        else if (player.transform.localPosition == state.stairPosition) {
             yield return player.Move(state.stairDirection, false);
             yield return player.Move(state.stairDirection, false);
         }
@@ -153,9 +157,9 @@ public class Map : MonoBehaviour
 
     // Mummy trace
     Vector3 Trace(Vector3 position) {
-        int x = (int) player.transform.localPosition.x;
-        int y = (int) player.transform.localPosition.y;
-        int z = (int) player.transform.localPosition.z;
+        int x = (int) state.player.transform.localPosition.x;
+        int y = (int) state.player.transform.localPosition.y;
+        int z = (int) state.player.transform.localPosition.z;
         int px = (int) position.x;
         int py = (int) position.y;
         int pz = (int) position.z;
