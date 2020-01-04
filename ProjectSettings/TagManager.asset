@@ -52,3 +52,6 @@ TagManager:
   - name: Foreground
     uniqueID: 2447269397
     locked: 0
+  - name: SpecialEffect
+    uniqueID: 34450061
+    locked: 0
