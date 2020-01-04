@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 6738898773607831560}
   - component: {fileID: 605795302896318488}
   m_Layer: 0
-  m_Name: Stair right
-  m_TagString: Untagged
+  m_Name: RightStair
+  m_TagString: Stair
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

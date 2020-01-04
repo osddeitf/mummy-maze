@@ -5,6 +5,10 @@ TagManager:
   serializedVersion: 2
   tags:
   - Map
+  - Bot
+  - Stair
+  - HorizontalWall
+  - VerticalWall
   layers:
   - Default
   - TransparentFX

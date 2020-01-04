@@ -11,10 +11,9 @@ GameObject:
   - component: {fileID: 614181872785909626}
   - component: {fileID: 614181872785909624}
   - component: {fileID: 614181872785909625}
-  - component: {fileID: 114091080963348814}
   m_Layer: 0
   m_Name: Mummy
-  m_TagString: Untagged
+  m_TagString: Bot
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -27,7 +26,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 614181872785909627}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -101,16 +100,3 @@ MonoBehaviour:
   - {fileID: 2800000, guid: 488f34ea56106874894e6dcde7e0b65a, type: 3}
   - {fileID: 2800000, guid: 42f7e719f2b0cbb4aa59b2301feb68ef, type: 3}
   - {fileID: 2800000, guid: 79f775a612afc3b42bc5d872f00cb7b7, type: 3}
---- !u!114 &114091080963348814
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 614181872785909627}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a5a20f94a40703f4a8e95190c36a491c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  texture: {fileID: 2800000, guid: a17c6e294777e3c4db131bb9cb1eb573, type: 3}
