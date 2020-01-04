@@ -47,8 +47,10 @@ public class Map : MonoBehaviour
     public GameObject stair_down;
     public GameObject stair_left;
     public GameObject stair_right;
+    public GameObject effect;
     
     // Internal
+    Effect fx;
     Character bot;
     Character player;
     Configuration config;
@@ -99,6 +101,7 @@ public class Map : MonoBehaviour
         // Characters
         bot = Spawn(mummy, config.mummy).GetComponent<Character>();
         player = Spawn(explorer, config.explorer).GetComponent<Character>();
+        fx = Spawn(effect, config.explorer).GetComponent<Effect>();
     }
 
     // Update is called once per frame
@@ -121,7 +124,7 @@ public class Map : MonoBehaviour
 
         // Player move 1 step
         if (!Move(ref config.explorer, direction)) yield break;
-        
+
         idle = false;
         yield return player.Move(direction, false);
         
@@ -134,6 +137,9 @@ public class Map : MonoBehaviour
         // Lose
         if (config.explorer == config.mummy) {
             Destroy(player.gameObject);
+            fx.gameObject.transform.position = bot.gameObject.transform.position;
+            StartCoroutine(fx.Run(true));
+            yield return bot.gameObject.GetComponent<Effect>().Run();
         }
         else if (config.explorer == config.stair) {
             yield return player.Move(config.stairDirection, false);

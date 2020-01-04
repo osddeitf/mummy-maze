@@ -12,7 +12,7 @@ public class Character : MonoBehaviour
     public Texture2D right;
     public Texture2D[] idle;
 
-    class SpriteAnimation {
+    public class SpriteAnimation {
         public Sprite[] frame;
         public SpriteAnimation(Texture2D texture) {
             int size = texture.height;
@@ -59,8 +59,10 @@ public class Character : MonoBehaviour
     }
 
     public IEnumerator Move(Vector3 direction, bool blocked, float duration = 1.0f / 3) {
-        StopCoroutine(idleAnimation);
         SpriteAnimation animation = AnimationTowards(direction);
+        if (animation == null) yield break;
+
+        StopCoroutine(idleAnimation);
 
         if (blocked) {
             renderer.sprite = animation.frame[0];
