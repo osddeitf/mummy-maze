@@ -96,3 +96,9 @@ MonoBehaviour:
   down: {fileID: 2800000, guid: 8a25129118965ee42a195b97833a5af1, type: 3}
   left: {fileID: 2800000, guid: 782afa4bcb034ba40bf0527688d86240, type: 3}
   right: {fileID: 2800000, guid: 0e81d4926bbbcf7428ce2c06814d392b, type: 3}
+  idle:
+  - {fileID: 2800000, guid: 0946777efb7e0e642bef5fa2341c2e8b, type: 3}
+  - {fileID: 2800000, guid: b2dea83557d9b554780bdafbcd1e410b, type: 3}
+  - {fileID: 2800000, guid: b8679d96968bb5a43b767d6eacd193ee, type: 3}
+  - {fileID: 2800000, guid: df00e6faded3bb34e954ccf0d3eef561, type: 3}
+  - {fileID: 2800000, guid: 60aefcd02d35c014ea9e3179359e42ec, type: 3}

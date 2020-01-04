@@ -96,3 +96,8 @@ MonoBehaviour:
   down: {fileID: 2800000, guid: b0c8d8fbc09e47448936ad9a0bc9abdb, type: 3}
   left: {fileID: 2800000, guid: a1ddb701bda4a23428c19c10bacf7dd8, type: 3}
   right: {fileID: 2800000, guid: 2a851fcf801b0f64cac6abc1ada3b1cf, type: 3}
+  idle:
+  - {fileID: 2800000, guid: 488f34ea56106874894e6dcde7e0b65a, type: 3}
+  - {fileID: 2800000, guid: 42f7e719f2b0cbb4aa59b2301feb68ef, type: 3}
+  - {fileID: 2800000, guid: 79f775a612afc3b42bc5d872f00cb7b7, type: 3}
+  dance: {fileID: 0}

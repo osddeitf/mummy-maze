@@ -10,10 +10,11 @@ public class Character : MonoBehaviour
     public Texture2D down;
     public Texture2D left;
     public Texture2D right;
+    public Texture2D[] idle;
 
-    class Animated {
+    class SpriteAnimation {
         public Sprite[] frame;
-        public Animated(Texture2D texture) {
+        public SpriteAnimation(Texture2D texture) {
             int size = texture.height;
             int len = texture.width / size;
 
@@ -25,21 +26,30 @@ public class Character : MonoBehaviour
     }
 
 
-    Animated animated_up;
-    Animated animated_down;
-    Animated animated_left;
-    Animated animated_right;
     SpriteRenderer renderer;
+    SpriteAnimation animation_up;
+    SpriteAnimation animation_down;
+    SpriteAnimation animation_left;
+    SpriteAnimation animation_right;
+    SpriteAnimation[] animation_idle;
+    Coroutine idleAnimation;
 
     // Start is called before the first frame update
     void Start()
     {
-        animated_up = new Animated(up);
-        animated_down = new Animated(down);
-        animated_left = new Animated(left);
-        animated_right = new Animated(right);
+        animation_up = new SpriteAnimation(up);
+        animation_down = new SpriteAnimation(down);
+        animation_left = new SpriteAnimation(left);
+        animation_right = new SpriteAnimation(right);
+        animation_idle = new SpriteAnimation[idle.Length];
+        
+        for (int i = 0; i < idle.Length; i++)
+            animation_idle[i] = new SpriteAnimation(idle[i]);
+
         renderer = GetComponent<SpriteRenderer>();
-        renderer.sprite = animated_down.frame[0];
+        renderer.sprite = animation_down.frame[0];
+        
+        idleAnimation = StartCoroutine(Idle());
     }
 
     // Update is called once per frame
@@ -48,38 +58,59 @@ public class Character : MonoBehaviour
         
     }
 
-    public void Face(Vector3 direction) {
-        if (direction == Vector3.up) renderer.sprite = animated_up.frame[0];
-        if (direction == Vector3.down) renderer.sprite = animated_down.frame[0];
-        if (direction == Vector3.left) renderer.sprite = animated_left.frame[0];
-        if (direction == Vector3.right) renderer.sprite = animated_right.frame[0];
+    public IEnumerator Move(Vector3 direction, bool blocked, float duration = 1.0f / 3) {
+        StopCoroutine(idleAnimation);
+        SpriteAnimation animation = AnimationTowards(direction);
+
+        if (blocked) {
+            renderer.sprite = animation.frame[0];
+        }
+        else {
+            StartCoroutine(Animate(animation, animation.frame.Length / duration));
+
+            // Translate
+            int frame = 30;
+            Vector3 momentum = direction * (60.0f / frame);
+            Vector3 target = direction * 60.0f + transform.localPosition;
+
+            for (int i = 0; i < frame; i++) {
+                transform.Translate(momentum);
+                yield return new WaitForSeconds(duration / frame);
+            }
+
+            transform.localPosition = target;
+        }
+
+        idleAnimation = StartCoroutine(Idle());
     }
 
-    public IEnumerator Move(Vector3 direction) {
+    SpriteAnimation AnimationTowards(Vector3 direction) {
+        if (direction == Vector3.up) return animation_up;
+        if (direction == Vector3.down) return animation_down;
+        if (direction == Vector3.left) return animation_left;
+        if (direction == Vector3.right) return animation_right;
+        return null;
+    }
 
-        Animated animate = null;
-        if (direction == Vector3.up) animate = animated_up;
-        if (direction == Vector3.down) animate = animated_down;
-        if (direction == Vector3.left) animate = animated_left;
-        if (direction == Vector3.right) animate = animated_right;
-        if (animate == null) yield break;
-
-        int n = animate.frame.Length;
-        int frame = n * 5;
-        float time = 0.3f;
-        float fps = time / frame;
-
-        Vector3 momentum = direction * (60.0f / frame);
-        Vector3 target = direction * 60 + transform.localPosition;
-
-        for (int i = 0; i < frame; i++) {
-            renderer.sprite = animate.frame[i / 5];
-            transform.Translate(momentum);
-            yield return new WaitForSeconds(fps);
+    IEnumerator Animate(SpriteAnimation animation, float fps, bool inverse = false) {
+        for (int i = 0; i < animation.frame.Length; i++) {
+            if (!inverse)
+                renderer.sprite = animation.frame[i];
+            else
+                renderer.sprite = animation.frame[animation.frame.Length-i-1];
+            yield return new WaitForSeconds(1.0f / fps);
         }
-        
-        // Fix position
-        renderer.sprite = animate.frame[0];
-        transform.localPosition = target;
+        renderer.sprite = animation.frame[0];
+    }
+
+    IEnumerator Idle() {
+        System.Random rand = new System.Random();
+        yield return new WaitForSeconds(5.0f);
+        while (true) {
+            int index = rand.Next(idle.Length);
+            yield return Animate(animation_idle[index], 20);
+            yield return Animate(animation_idle[index], 20, true);
+            yield return new WaitForSeconds(2.5f);
+        }
     }
 }

@@ -29,11 +29,11 @@ public class Map : MonoBehaviour
             new Vector2(3, 5),
             new Vector2(4, 5)
         };
-        // public Vector2 stair = new Vector2(0, 3);
-        // public Vector3 stairDirection = Vector3.left;
+        public Vector2 stair = new Vector2(0, 3);
+        public Vector3 stairDirection = Vector3.left;
         
-        public Vector2 stair = new Vector2(4, 0);
-        public Vector3 stairDirection = Vector3.down;
+        // public Vector2 stair = new Vector2(4, 0);
+        // public Vector3 stairDirection = Vector3.down;
         
         public bool restrictedVision = false;
     }
@@ -108,45 +108,36 @@ public class Map : MonoBehaviour
 
         Vector3 direction = Vector3.zero;
 
-        if (Input.GetKeyDown("up") && Move(ref config.explorer, Vector3.up))
-            direction = Vector3.up;
-        else if (Input.GetKeyDown("down") && Move(ref config.explorer, Vector3.down))
-            direction = Vector3.down;
-        else if (Input.GetKeyDown("left") && Move(ref config.explorer, Vector3.left))
-            direction = Vector3.left;
-        else if (Input.GetKeyDown("right") && Move(ref config.explorer, Vector3.right))
-            direction = Vector3.right;
+        if (Input.GetKeyDown("up")) direction = Vector3.up;
+        else if (Input.GetKeyDown("down")) direction = Vector3.down;
+        else if (Input.GetKeyDown("left")) direction = Vector3.left;
+        else if (Input.GetKeyDown("right")) direction = Vector3.right;
 
-        if (direction != Vector3.zero) StartCoroutine(Action(direction));
+        if (direction != Vector3.zero)
+            StartCoroutine(Action(direction));
     }
 
     IEnumerator Action(Vector3 direction) {
-        idle = false;
 
         // Player move 1 step
-        yield return StartCoroutine(player.Move(direction));
+        if (!Move(ref config.explorer, direction)) yield break;
+        
+        idle = false;
+        yield return player.Move(direction, false);
         
         // Mummy move 2 step
         for (int i = 0; i < 2; i++) {
             Vector3 next_move = Trace();
-            if (Blocked(config.mummy, next_move))
-                bot.Face(next_move);
-            else {
-                Move(ref config.mummy, next_move);
-                yield return StartCoroutine(bot.Move(next_move));
-            }
+            yield return bot.Move(next_move, !Move(ref config.mummy, next_move));
         }
 
         // Lose
         if (config.explorer == config.mummy) {
             Destroy(player.gameObject);
-            idle = false;
-            yield break;
         }
-        
-        if (config.explorer == config.stair) {
-            yield return StartCoroutine(player.Move(config.stairDirection));
-            yield return StartCoroutine(player.Move(config.stairDirection));
+        else if (config.explorer == config.stair) {
+            yield return player.Move(config.stairDirection, false);
+            yield return player.Move(config.stairDirection, false);
         }
 
         idle = true;
