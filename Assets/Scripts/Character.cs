@@ -20,7 +20,7 @@ public class Character : MonoBehaviour
 
             frame = new Sprite[len];
             for (int i = 0; i < len; i++) {
-                frame[i] = Sprite.Create(texture, new Rect(i * size, 0, size, size), new Vector2(0, 0), 1);
+                frame[i] = Sprite.Create(texture, new Rect(i * size, 0, size, size), new Vector2(0, 0), 60);
             }
         }
     }
@@ -47,7 +47,6 @@ public class Character : MonoBehaviour
             animation_idle[i] = new SpriteAnimation(idle[i]);
 
         renderer = GetComponent<SpriteRenderer>();
-        renderer.sprite = animation_down.frame[0];
         
         idleAnimation = StartCoroutine(Idle());
     }
@@ -72,8 +71,8 @@ public class Character : MonoBehaviour
 
             // Translate
             int frame = 30;
-            Vector3 momentum = direction * (60.0f / frame);
-            Vector3 target = direction * 60.0f + transform.localPosition;
+            Vector3 momentum = direction / frame;
+            Vector3 target = direction + transform.localPosition;
 
             for (int i = 0; i < frame; i++) {
                 transform.Translate(momentum);

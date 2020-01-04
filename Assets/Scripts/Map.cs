@@ -4,38 +4,21 @@ using UnityEngine;
 
 public class Map : MonoBehaviour
 {
-    // Map configuration
-    class Configuration {
-        public int size = 6;
-        public Vector2 explorer = new Vector2(2, 2);
-        public Vector2 mummy = new Vector2(2, 3);
-        public Vector2[] verticalWall = {
-            new Vector2(1, 5),
-            new Vector2(5, 4),
-            new Vector2(2, 4),
-            new Vector2(5, 3),
-            new Vector2(4, 3),
-            new Vector2(5, 1),
-            new Vector2(3, 1),
-        };
-        public Vector2[] horizontalWall = {
-            new Vector2(2, 1),
-            new Vector2(2, 2),
-            new Vector2(3, 2),
-            new Vector2(1, 3),
-            new Vector2(4, 3),
-            new Vector2(1, 4),
-            new Vector2(3, 4),
-            new Vector2(3, 5),
-            new Vector2(4, 5)
-        };
-        public Vector2 stair = new Vector2(0, 3);
+    class GameState {
+        public int size;
+        public bool idle;
+        
+        public int[,] verticalWall;
+        public int[,] horizontalWall;
         public Vector3 stairDirection = Vector3.left;
-        
-        // public Vector2 stair = new Vector2(4, 0);
-        // public Vector3 stairDirection = Vector3.down;
-        
         public bool restrictedVision = false;
+
+        public GameState(int size) {
+            this.size = size;
+            this.idle = true;
+            verticalWall = new int[size, size];
+            horizontalWall = new int[size, size];
+        }
     }
 
     // Inspector
@@ -47,67 +30,62 @@ public class Map : MonoBehaviour
     public GameObject stair_down;
     public GameObject stair_left;
     public GameObject stair_right;
-    public GameObject effect;
+    public GameObject dust_effect;
+    public GameObject defeat_effect;
     
     // Internal
-    Effect fx;
+    Effect dustFx;
+    Effect defeatFx;
     Character bot;
     Character player;
-    Configuration config;
-    int[,] verticalWall;
-    int[,] horizontalWall;
-    bool idle = true;
-
-
-    GameObject Spawn(GameObject prefab, Vector2 coordinate) {
-        Vector3 position = transform.position + new Vector3(coordinate.x*60, coordinate.y*60, 0);
-        return (GameObject)Instantiate(prefab, position, Quaternion.identity, transform);
-    }
+    GameObject stair;
+    GameState state;
 
     // Start is called before the first frame update
     void Start()
     {
-        config = new Configuration();
-        int n = config.size;
+        int n = 6;
+        state = new GameState(n);
 
-        // Wall mask
-        verticalWall = new int[n, n];
-        horizontalWall = new int[n, n];
+        foreach (Transform t in transform) {
+            int x = (int) t.localPosition.x;
+            int y = (int) t.localPosition.y;
+            Vector2 p = new Vector2(x, y);
 
-        foreach (Vector2 v in config.verticalWall)
-            verticalWall[(int)v.x, (int)v.y] = 1;
-        
-        foreach (Vector2 v in config.horizontalWall)
-            horizontalWall[(int)v.x, (int)v.y] = 1;
-
-        // Wall
-        for (int y = n-1; y >= 0; y--) {
-            for (int x = 0; x < n; x++) {
-                if (verticalWall[x, y] == 1) Spawn(wall_v, new Vector2(x, y));
-                if (horizontalWall[x, y] == 1) Spawn(wall_h, new Vector2(x, y));
+            switch (t.tag) {
+                case "Player":
+                    player = t.GetComponent<Character>();
+                    break;
+                case "Bot":
+                    bot = t.GetComponent<Character>();
+                    break;
+                case "Stair":
+                    stair = t.gameObject;
+                    if (x == 0) state.stairDirection = Vector3.left;
+                    if (y == 0) state.stairDirection = Vector3.down;
+                    if (x == n) state.stairDirection = Vector3.right;
+                    if (y == n) state.stairDirection = Vector3.up;
+                    break;
+                case "VerticalWall":
+                    state.verticalWall[x, y] = 1;
+                    break;
+                case "HorizontalWall":
+                    state.horizontalWall[x, y] = 1;
+                    break;
+                default:
+                    Debug.Log("Unexpected game object with tag: " + t.tag);
+                    break;
             }
         }
 
-        // Stair
-        if (config.stair.x == 0)
-            Spawn(stair_left, config.stair);
-        else if (config.stair.y == 0)
-            Spawn(stair_down, config.stair);
-        else if (config.stair.x == config.size)
-            Spawn(stair_right, config.stair);
-        else if (config.stair.y == config.size)
-            Spawn(stair_up, config.stair);        
-
-        // Characters
-        bot = Spawn(mummy, config.mummy).GetComponent<Character>();
-        player = Spawn(explorer, config.explorer).GetComponent<Character>();
-        fx = Spawn(effect, config.explorer).GetComponent<Effect>();
+        dustFx = ((GameObject)Instantiate(dust_effect, transform)).GetComponent<Effect>();
+        defeatFx = ((GameObject)Instantiate(defeat_effect, transform)).GetComponent<Effect>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!idle) return;
+        if (!state.idle) return;
 
         Vector3 direction = Vector3.zero;
 
@@ -123,70 +101,76 @@ public class Map : MonoBehaviour
     IEnumerator Action(Vector3 direction) {
 
         // Player move 1 step
-        if (!Move(ref config.explorer, direction)) yield break;
+        if (Blocked(player.transform.localPosition, direction)) yield break;
 
-        idle = false;
+        state.idle = false;
         yield return player.Move(direction, false);
         
         // Mummy move 2 step
         for (int i = 0; i < 2; i++) {
-            Vector3 next_move = Trace();
-            yield return bot.Move(next_move, !Move(ref config.mummy, next_move));
+            Vector3 next_move = Trace(bot.transform.localPosition);
+            bool isBlocked = Blocked(bot.transform.localPosition, next_move);
+            yield return bot.Move(next_move, isBlocked);
         }
 
         // Lose
-        if (config.explorer == config.mummy) {
+        if (player.transform.localPosition == bot.transform.localPosition) {
+            Destroy(bot.gameObject);
             Destroy(player.gameObject);
-            fx.gameObject.transform.position = bot.gameObject.transform.position;
-            StartCoroutine(fx.Run(true));
-            yield return bot.gameObject.GetComponent<Effect>().Run();
+
+            dustFx.gameObject.transform.position = bot.gameObject.transform.position + Vector3.forward;
+            defeatFx.gameObject.transform.position = bot.gameObject.transform.position;
+
+            StartCoroutine(defeatFx.Run(false));
+            yield return StartCoroutine(dustFx.Run(true));
         }
-        else if (config.explorer == config.stair) {
-            yield return player.Move(config.stairDirection, false);
-            yield return player.Move(config.stairDirection, false);
+        else if (player.transform.localPosition == stair.transform.localPosition) {
+            yield return player.Move(state.stairDirection, false);
+            yield return player.Move(state.stairDirection, false);
         }
 
-        idle = true;
+        state.idle = true;
     }
 
-    bool Blocked(Vector2 position, Vector3 direction) {
+    bool Blocked(Vector3 position, Vector3 direction) {
         int x = (int)position.x;
         int y = (int)position.y;
         
         if (direction == Vector3.up)
-            return y + 1 == config.size || horizontalWall[x, y+1] == 1;
+            return y + 1 == state.size || state.horizontalWall[x, y+1] == 1;
         
         if (direction == Vector3.right)
-            return x + 1 == config.size || verticalWall[x+1, y] == 1;
+            return x + 1 == state.size || state.verticalWall[x+1, y] == 1;
 
         if (direction == Vector3.down)
-            return y == 0 || horizontalWall[x, y] == 1;
+            return y == 0 || state.horizontalWall[x, y] == 1;
 
         if (direction == Vector3.left)
-            return x == 0 || verticalWall[x, y] == 1;
+            return x == 0 || state.verticalWall[x, y] == 1;
         
-        return true;
-    }
-
-    bool Move(ref Vector2 position, Vector3 direction) {
-        if (Blocked(position, direction)) return false;
-        position.x += direction.x;
-        position.y += direction.y;
         return true;
     }
 
     // Mummy trace
-    Vector3 Trace() {
-        if (config.explorer.x > config.mummy.x) {
-            if (!Blocked(config.mummy, Vector3.right)) return Vector3.right;
+    Vector3 Trace(Vector3 position) {
+        int x = (int) player.transform.localPosition.x;
+        int y = (int) player.transform.localPosition.y;
+        int z = (int) player.transform.localPosition.z;
+        int px = (int) position.x;
+        int py = (int) position.y;
+        int pz = (int) position.z;
+
+        if (x > px) {
+            if (!Blocked(position, Vector3.right)) return Vector3.right;
         }
-        if (config.explorer.x < config.mummy.x) {
-            if (!Blocked(config.mummy, Vector3.left)) return Vector3.left;
+        if (x < px) {
+            if (!Blocked(position, Vector3.left)) return Vector3.left;
         }
-        if (config.explorer.y > config.mummy.y) return Vector3.up;
-        if (config.explorer.y < config.mummy.y) return Vector3.down;
-        if (config.explorer.x > config.mummy.x) return Vector3.right;
-        if (config.explorer.x < config.mummy.x) return Vector3.left;
+        if (y > py) return Vector3.up;
+        if (y < py) return Vector3.down;
+        if (x > px) return Vector3.right;
+        if (x < px) return Vector3.left;
+
         return Vector3.zero;
     }
 }

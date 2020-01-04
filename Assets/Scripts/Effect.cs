@@ -14,6 +14,7 @@ public class Effect : MonoBehaviour
     {
         animation = new SpriteAnimation(texture);
         renderer = GetComponent<SpriteRenderer>();
+        renderer.sprite = null;
     }
 
     // Update is called once per frame
