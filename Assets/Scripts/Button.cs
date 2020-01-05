@@ -38,8 +38,4 @@ public class Button : MonoBehaviour
     void OnMouseUp() {
         render.sprite = null;
     }
-
-    void OnMouseUpAsButton() {
-        Debug.Log("Button clicked");
-    }
 }

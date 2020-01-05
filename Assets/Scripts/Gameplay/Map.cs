@@ -26,14 +26,6 @@ public class Map : MonoBehaviour
     }
 
     // Inspector
-    public GameObject mummy;
-    public GameObject explorer;
-    public GameObject wall_v;
-    public GameObject wall_h;
-    public GameObject stair_up;
-    public GameObject stair_down;
-    public GameObject stair_left;
-    public GameObject stair_right;
     public GameObject dust_effect;
     public GameObject defeat_effect;
     
