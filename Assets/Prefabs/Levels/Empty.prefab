@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1946317039891453984}
   - component: {fileID: 1946317039891453985}
-  - component: {fileID: 1946317039891454014}
+  - component: {fileID: 8951317409067512872}
   m_Layer: 0
-  m_Name: EmptyLevel
+  m_Name: Empty
   m_TagString: Map
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -80,7 +80,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &1946317039891454014
+--- !u!114 &8951317409067512872
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -89,7 +89,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1946317039891453987}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a813bfe73c0a09343870cd03e08d1826, type: 3}
+  m_Script: {fileID: 11500000, guid: c710770825321104fb4b6214c3bd8c9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   dust_effect: {fileID: 4969925174467188208, guid: 5364adf705c267842a92caf72c89b6ea,
