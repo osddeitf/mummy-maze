@@ -124,6 +124,7 @@ GameObject:
   - component: {fileID: 88320725}
   - component: {fileID: 88320727}
   - component: {fileID: 88320726}
+  - component: {fileID: 88320728}
   m_Layer: 0
   m_Name: World Button
   m_TagString: Untagged
@@ -233,6 +234,18 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 2.0042694, y: 0.56175435}
   m_EdgeRadius: 0
+--- !u!114 &88320728
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 88320723}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d6204c682af4ff48a6c11679cc664e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &361175431
 GameObject:
   m_ObjectHideFlags: 0
@@ -766,6 +779,7 @@ GameObject:
   - component: {fileID: 1731346306}
   - component: {fileID: 1731346308}
   - component: {fileID: 1731346307}
+  - component: {fileID: 1731346309}
   m_Layer: 0
   m_Name: Reset Button
   m_TagString: Untagged
@@ -875,6 +889,18 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 2.0196278, y: 0.57711434}
   m_EdgeRadius: 0
+--- !u!114 &1731346309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1731346304}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2816db22c0696234aa13275307278353, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2080603737
 GameObject:
   m_ObjectHideFlags: 0
