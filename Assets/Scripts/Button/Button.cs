@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Button : MonoBehaviour
 {
+    public Sprite texture;
     public Sprite hoverTexture;
     public Sprite downTexture;
     SpriteRenderer render;
@@ -12,7 +13,7 @@ public class Button : MonoBehaviour
     void Start()
     {
         render = GetComponent<SpriteRenderer>();
-        render.sprite = null;
+        render.sprite = texture;
     }
 
     // Update is called once per frame
@@ -22,20 +23,22 @@ public class Button : MonoBehaviour
     }
 
     void OnMouseEnter() {
-        if (render.sprite == null)
+        if (render.sprite == texture)
             render.sprite = hoverTexture;
     }
 
     void OnMouseExit() {
         if (render.sprite == hoverTexture)
-            render.sprite = null;
+            render.sprite = texture;
     }
 
     void OnMouseDown() {
-        render.sprite = downTexture;
+        if (downTexture != null)
+            render.sprite = downTexture;
     }
 
     void OnMouseUp() {
-        render.sprite = null;
+        if (downTexture != null)
+            render.sprite = texture;
     }
 }
