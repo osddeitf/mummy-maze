@@ -9,18 +9,11 @@ public class Effect : MonoBehaviour
     SpriteAnimation animation;
     SpriteRenderer renderer;
 
-    // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         animation = new SpriteAnimation(texture);
         renderer = GetComponent<SpriteRenderer>();
         renderer.sprite = null;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     public IEnumerator Run(bool clear = false)
@@ -36,9 +29,10 @@ public class Effect : MonoBehaviour
                 renderer.sprite = animation.frame[i];
             else
                 renderer.sprite = animation.frame[animation.frame.Length-i-1];
-            yield return new WaitForSeconds(1.0f / fps);
+            
+            if (i < animation.frame.Length-1)
+                yield return new WaitForSeconds(1.0f / fps);
         }
-        renderer.sprite = animation.frame[0];
     }
 
 }
