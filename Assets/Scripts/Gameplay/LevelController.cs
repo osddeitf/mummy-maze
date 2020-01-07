@@ -51,8 +51,14 @@ public class LevelController : MonoBehaviour
                     stairPosition = t.localPosition;
                     if (x == 0) stairDirection = Vector3.left;
                     if (y == 0) stairDirection = Vector3.down;
-                    if (x == n) stairDirection = Vector3.right;
-                    if (y == n) stairDirection = Vector3.up;
+                    if (x == n) {
+                        stairPosition.x--;
+                        stairDirection = Vector3.right;
+                    }
+                    if (y == n) {
+                        stairPosition.y--;
+                        stairDirection = Vector3.up;
+                    }
                     break;
                 case "VerticalWall":
                     verticalWall[x, y] = 1;
