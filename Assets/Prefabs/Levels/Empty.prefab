@@ -92,6 +92,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c710770825321104fb4b6214c3bd8c9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  winOverlay: {fileID: 3777023862954251493, guid: b56334d5a26560d46b6d295b9725a4b6,
+    type: 3}
+  loseOverlay: {fileID: 6419117505728361425, guid: ccef3f73e83f286499864e76eb866c96,
+    type: 3}
   dust_effect: {fileID: 4969925174467188208, guid: 5364adf705c267842a92caf72c89b6ea,
     type: 3}
   defeat_effect: {fileID: 3333509127615787088, guid: 0ca9c735194354748ba1c955fa135fd8,

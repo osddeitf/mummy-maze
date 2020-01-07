@@ -26,6 +26,8 @@ public class LevelController : MonoBehaviour
     }
 
     // Inspector
+    public GameObject winOverlay;
+    public GameObject loseOverlay;
     public GameObject dust_effect;
     public GameObject defeat_effect;
     
@@ -119,10 +121,16 @@ public class LevelController : MonoBehaviour
 
             StartCoroutine(defeatFx.Run(false));
             yield return StartCoroutine(dustFx.Run(true));
+
+            Instantiate(loseOverlay, transform, true);
         }
         else if (player.transform.localPosition == state.stairPosition) {
             yield return player.Move(state.stairDirection, false);
-            yield return player.Move(state.stairDirection, false);
+            
+            Destroy(mummy.gameObject);
+            Destroy(player.gameObject);
+            
+            Instantiate(winOverlay, transform, true);
         }
 
         state.idle = true;
