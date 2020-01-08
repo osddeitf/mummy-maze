@@ -4,6 +4,12 @@ using UnityEngine;
 
 public class LevelController : MonoBehaviour
 {
+    class Checkpoint {
+        public Vector3 player;
+        public List<Vector3> mummies = new List<Vector3>();
+    }
+
+
     // Inspector
     public GameObject winOverlay;
     public GameObject loseOverlay;
@@ -14,6 +20,7 @@ public class LevelController : MonoBehaviour
     public bool idle;
     public Character player;
     public List<Character> mummies;
+    public Stack checkpoints = new Stack();
     
     // Static
     public int size;
@@ -44,7 +51,8 @@ public class LevelController : MonoBehaviour
                 case "Player":
                     player = t.GetComponent<Character>();
                     break;
-                case "Bot":
+                case "WhiteMummy":
+                case "RedMummy":
                     mummies.Add(t.GetComponent<Character>());
                     break;
                 case "Stair":
@@ -143,7 +151,7 @@ public class LevelController : MonoBehaviour
     }
 
     // Mummies    
-    Vector3 MummyTrace(Vector3 position) {
+    Vector3 WhiteTrace(Vector3 position) {
         int x = (int) player.transform.localPosition.x;
         int y = (int) player.transform.localPosition.y;
         int z = (int) player.transform.localPosition.z;
@@ -165,11 +173,36 @@ public class LevelController : MonoBehaviour
         return Vector3.zero;
     }
 
+    Vector3 RedTrace(Vector3 position) {
+        int x = (int) player.transform.localPosition.x;
+        int y = (int) player.transform.localPosition.y;
+        int z = (int) player.transform.localPosition.z;
+        int px = (int) position.x;
+        int py = (int) position.y;
+        int pz = (int) position.z;
+
+        if (y > py) {
+            if (!Blocked(position, Vector3.up)) return Vector3.up;
+        }
+        if (y < py) {
+            if (!Blocked(position, Vector3.down)) return Vector3.down;
+        }
+        if (x > px) return Vector3.right;
+        if (x < px) return Vector3.left;
+        if (y > py) return Vector3.up;
+        if (y < py) return Vector3.down;
+
+        return Vector3.zero;
+    }
+
     IEnumerator MummiesMove() {
         List<IEnumerator> coroutines = new List<IEnumerator>();
 
         foreach (var mummy in mummies) {
-            Vector3 next_move = MummyTrace(mummy.transform.localPosition);
+            Vector3 next_move = mummy.tag == "WhiteMummy"
+                ? WhiteTrace(mummy.transform.localPosition)
+                : RedTrace(mummy.transform.localPosition);
+            
             bool isBlocked = Blocked(mummy.transform.localPosition, next_move);
             
             coroutines.Add(mummy.Move(next_move, isBlocked));
@@ -258,5 +291,20 @@ public class LevelController : MonoBehaviour
             if (current == null) break;
             yield return current;
         }
+    }
+
+    // Undo
+    public void Save() {
+        var checkpoint = new Checkpoint();
+        checkpoint.player = player.transform.localPosition;
+        foreach (var mummy in mummies) {
+            checkpoint.mummies.Add(mummy.transform.localPosition);
+        }
+        checkpoints.Push(checkpoint);
+    }
+
+    public void Restore() {
+        var checkpoint = (Checkpoint)checkpoints.Pop();
+        
     }
 }

@@ -5,10 +5,11 @@ TagManager:
   serializedVersion: 2
   tags:
   - Map
-  - Bot
   - Stair
   - HorizontalWall
   - VerticalWall
+  - WhiteMummy
+  - RedMummy
   layers:
   - Default
   - TransparentFX
